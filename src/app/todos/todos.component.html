@@ -1,0 +1,19 @@
+<div class="row">
+  <div class="col-md-7 offset-md-2 input-group input-group-lg">
+    <input #todoTitle autofocus type="text" (keydown.enter)="add(todoTitle.value); todoTitle.value=''" class="form-control" placeholder="Write your task here....."
+      aria-label="Large" aria-describedby="inputGroup-sizing-sm">
+  </div>
+</div>
+<hr>
+<div class="row" *ngFor="let todo of todos">
+  <div class="col-md-7 offset-md-2">
+    <div class="input-group mb-3">
+      <h1 class="form-control">{{todo.title}}</h1>
+      <div class="input-group-append">
+        <div class="input-group-text bg-danger" (click)="delete(todo)">
+          <i class="fa fa-trash-o text-white"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

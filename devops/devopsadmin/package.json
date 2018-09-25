@@ -1,0 +1,32 @@
+{
+  "name": "devops-admin",
+  "version": "0.1.0",
+  "description": "An administrative interface for MindSphere that also proxies other internal components",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.com/mindsphere/devops-demo.git"
+  },
+  "author": "Roger Meier <r.meier@siemens.com>",
+  "contributors": [
+    "Diego Louzán <diego.louzan.ext@siemens.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node index.js",
+    "license": "license-checker --onlyAllow 'Apache-2.0; BSD; BSD-2-Clause; BSD-3-Clause; ISC; MIT; Unlicense; WTFPL; CC-BY-3.0; CC0-1.0' --production"
+  },
+  "engines": {
+    "node": "^8.11.1",
+    "npm": "^5.6.0"
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "express-http-proxy": "^1.2.0",
+    "jsonwebtoken": "^8.3.0",
+    "license-checker": "^20.2.0",
+    "lodash.includes": "^4.3.0",
+    "superagent": "^3.8.3"
+  }
+}

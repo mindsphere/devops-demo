@@ -1,0 +1,9 @@
+---
+applications:
+- name: devopsadmin
+  buildpacks:
+  - nodejs_buildpack
+  memory: 64M
+  disk_quota: 128M
+  env:
+    OPTIMIZE_MEMORY: true

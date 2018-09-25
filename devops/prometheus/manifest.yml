@@ -1,0 +1,13 @@
+---
+applications:
+- name: prometheus
+  buildpacks:
+  - go_buildpack
+  memory: 128M
+  disk_quota: 1G
+  command: prometheus --config.file=./mindsphere-conf/prometheus.yml --log.level=info --web.listen-address=:8080 --web.route-prefix=/ --web.external-url=${PROM_EXTERNAL_URL}
+  env:
+    GOPACKAGENAME: github.com/prometheus/prometheus
+    GOVERSION: go1.10
+    GO_INSTALL_PACKAGE_SPEC: github.com/prometheus/prometheus/cmd/prometheus
+

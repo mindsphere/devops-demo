@@ -1,0 +1,18 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+rule_files:
+# - "first.rules"
+# - "second.rules"
+
+scrape_configs:
+- job_name: prometheus
+  static_configs:
+  - targets: ['localhost:8080']
+  metrics_path: '/metrics'
+- job_name: todo
+  static_configs:
+  - targets: ['<todo-internal-address>']
+  metrics_path: '/metrics'
+  scheme: https

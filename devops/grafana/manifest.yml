@@ -1,0 +1,13 @@
+---
+applications:
+- name: grafana
+  buildpacks:
+  - go_buildpack
+  memory: 96M
+  disk_quota: 256M
+  command: grafana-server -config mindsphere-conf/defaults.custom.ini
+  env:
+    GOPACKAGENAME: github.com/grafana/grafana
+    GOVERSION: go1.10
+    GO_INSTALL_PACKAGE_SPEC: github.com/grafana/grafana/pkg/cmd/grafana-server
+

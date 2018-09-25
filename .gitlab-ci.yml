@@ -1,0 +1,93 @@
+# Copyright Siemens AG 2018
+# SPDX-License-Identifier: MIT
+
+# The following CI/CD variables are required:
+# - CF_ORG
+# - CF_SPACE_DEV
+# - CF_SPACE_STAGE
+# - CF_API
+# - CF_ACCESS_TOKEN
+# - CF_REFRESH_TOKEN
+# - JWKS_URI
+# - JWT_ISSUER
+
+# Optional you can also set the following ones if you are behind a proxy
+# - npm_config_registry
+# - npm_config_sass_binary_site
+# - npm_config_chromedriver_cdnurl
+# - https_proxy
+# - no_proxy
+
+test:
+  stage: test
+  image: node:carbon
+  variables:
+    SELENIUM_URL: http://selenium__standalone-chrome:4444/wd/hub
+    MONGODB_URL: mongodb://mongo:27017/e2e
+  services:
+    - selenium/standalone-chrome:3.5.2
+    - mongo:3.2
+  script:
+    - yarn
+    - yarn commitlint
+    - yarn lint
+    - yarn license:all
+    - yarn build --no-progress --prod
+    - yarn build --no-progress
+    - yarn test --no-progress --code-coverage
+    - cd server && yarn && cd ..
+    - export BASE_URL=http://$(hostname -i):3000
+    - yarn e2e
+  artifacts:
+    reports:
+      junit:
+        - coverage/*.xml
+        - test-reports/*.xml
+mindsphere-dev:
+  stage: deploy
+  image: node:carbon
+  environment:
+    name: dev
+  before_script:
+    - curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx
+    - mv cf /usr/local/bin
+    - mkdir -p ~/.cf
+    - echo "{\"ConfigVersion\":3,\"Target\":\"$CF_API\",\"AccessToken\":\"bearer ${CF_ACCESS_TOKEN}\",\"RefreshToken\":\"${CF_REFRESH_TOKEN}\"}" > ~/.cf/config.json
+  script:
+    - cf target -o "$CF_ORG" -s "$CF_SPACE_DEV"
+    - yarn
+    - yarn build --no-progress --prod
+    - cd server
+    - yarn
+    - cf push todo-dev --no-start
+    - cf set-env todo-dev JWKS_URI "${JWKS_URI}"
+    - cf set-env todo-dev JWT_ISSUER "${JWT_ISSUER}"
+    - cf bind-service todo-dev todo-mongodb-dev
+    - cf bind-service todo-dev todo-logme-dev
+    - cf start todo-dev
+  only:
+  - master
+mindsphere-stage:
+  stage: deploy
+  image: node:carbon
+  environment:
+    name: stage
+  before_script:
+  - curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx
+  - mv cf /usr/local/bin
+  - mkdir -p ~/.cf
+  - echo "{\"ConfigVersion\":3,\"Target\":\"$CF_API\",\"AccessToken\":\"bearer ${CF_ACCESS_TOKEN}\",\"RefreshToken\":\"${CF_REFRESH_TOKEN}\"}" > ~/.cf/config.json
+  script:
+    - cf target -o "$CF_ORG" -s "$CF_SPACE_STAGE"
+    - yarn
+    - yarn build --no-progress --prod
+    - cd server
+    - yarn
+    - cf push todo-stage --no-start
+    - cf set-env todo-stage JWKS_URI "${JWKS_URI}"
+    - cf set-env todo-stage JWT_ISSUER "${JWT_ISSUER}"
+    - cf bind-service todo-stage todo-mongodb-stage
+    - cf bind-service todo-stage todo-logme-stage
+    - cf start todo-stage
+  only:
+  - tags

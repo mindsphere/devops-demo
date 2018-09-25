@@ -1,0 +1,103 @@
+openapi: "3.0.0"
+info:
+  title: Todo API
+  version: 0.1.0
+  license:
+    name: MIT
+servers:
+  - url: /
+paths:
+  /todo:
+    get:
+      summary: List todo tasks
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskFull"
+        '400':
+          content:
+            text/plain:
+              type: string
+              enum: ["Bad Request"]
+    post:
+      summary: Create todo task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Task"
+      responses:
+        '201':
+          description: Successful create
+          content:
+            text/plain:
+              type: string
+              enum: ["Created"]
+        '400':
+          description: Invalid request
+          content:
+            text/plain:
+              type: string
+              enum: ["Bad Request"]
+  /todo/{id}:
+    delete:
+      summary: Remove single todo task
+      parameters:
+        - name: id
+          in: path
+          description: Task identifier
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful delete
+          content:
+            text/plain:
+              type: string
+              enum: ["OK"]
+        '400':
+          content:
+            text/plain:
+              type: string
+              enum: ["Bad Request"]
+  /health_check:
+    get:
+      summary: Reports whether the app is healthy or not. Checks availability of required services (e.g. db)
+      responses:
+        '200':
+          description: Healthy
+          content:
+            text/plain:
+              type: string
+              enum: ["OK"]
+        '503':
+          description: Unhealthy
+          content:
+            text/plain:
+              type: string
+              enum: ["Service Unavailable"]
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Task name, cannot be empty
+      required:
+        - title
+    TaskFull:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Task identifier. Auto-assigned on object creation
+        title:
+          $ref: "#/components/schemas/Task/properties/title"
+      required:
+        - _id
+        - title

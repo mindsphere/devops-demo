@@ -1,0 +1,9 @@
+{
+  "line-length": {
+    "tables": false,
+    "code_blocks": false
+  },
+  "no-hard-tabs": true,
+  "no-bare-urls": false,
+  "fenced-code-language": false
+}
