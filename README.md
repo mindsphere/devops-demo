@@ -62,18 +62,18 @@ available:
 - The mongodb service is required. You can choose whichever name you please,
   the app will auto-discover it on startup:
 
-     ```sh
-     cf create-service mongodb32 mongodb-xs todo-mongodb
-     ```
+    ```sh
+    cf create-service mongodb32 mongodb-xs todo-mongodb
+    ```
 
 - Create the LogMe (ELK) service for log aggregation. This is
   *not a requirement*, and the same service can be used to aggregate any
-   number of app logs. The MindSphere platform will automatically gather
-   the logs after binding:
+  number of app logs. The MindSphere platform will automatically gather
+  the logs after binding:
 
-     ```sh
-     cf create-service logme logme-xs todo-logme
-     ```
+    ```sh
+    cf create-service logme logme-xs todo-logme
+    ```
 
 Build & push the todo app, set authentication environment variables, and
 bind the services:
@@ -106,7 +106,7 @@ More information under: https://developer.mindsphere.io/concepts/concept-csp.htm
 ### Live development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app
- will automatically reload if you change any of the source files.
+will automatically reload if you change any of the source files.
 
 ### Code scaffolding
 

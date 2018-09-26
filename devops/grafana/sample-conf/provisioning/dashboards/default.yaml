@@ -2,9 +2,9 @@
 apiVersion: 1
 
 providers:
- - name: 'default'
-   orgId: 1
-   folder: ''
-   type: file
-   options:
-     path: ./mindsphere-conf/provisioning/dashboards/json
+  - name: 'default'
+    orgId: 1
+    folder: ''
+    type: file
+    options:
+      path: ./mindsphere-conf/provisioning/dashboards/json
