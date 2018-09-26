@@ -53,9 +53,9 @@ app.get('/http/', function (req, res) {
 });
 
 app.get('/env/', function (req, res) {
-   res.writeHead(200, { 'Content-Type': 'application/json' });
-   res.end(JSON.stringify(process.env));
- });
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(process.env));
+});
 
 app.get('/jwt/', function (req, res) {
   let authorizationHeader = authHeader = req.get('authorization');

@@ -24,35 +24,35 @@ The following environment variables are recognized by the todo backend:
 ## Deploy to MindSphere
 
 1. Copy and adapt `conf/prometheus.yml.sample` to `conf/prometheus.yml`,
-   specifically:
-   - `targets` of `todo` job, point to the internal address of the todo app
+  specifically:
+    - `targets` of `todo` job, point to the internal address of the todo app
 
 1. Download the prometheus source code. This will save the code to your
-   `${GOPATH}` (typically `~/go` or `~/.go`)
+  `${GOPATH}` (typically `~/go` or `~/.go`)
 
-     ```sh
-     go get github.com/prometheus/prometheus/cmd/...
-     ```
+    ```sh
+    go get github.com/prometheus/prometheus/cmd/...
+    ```
 
 1. Ensure you are in the right CloudFoundry space and push to MindSphere. The
-   command will also copy the required configuration files to the prometheus
-   source before push.
+  command will also copy the required configuration files to the prometheus
+  source before push.
 
-     ```sh
-     APP_NAME="prometheus" \
-     PROM_CONF_FILE="<path>" \
-     PROM_EXTERNAL_URL="<url>" \
-     ./deploy.sh
-     ```
+    ```sh
+    APP_NAME="prometheus" \
+    PROM_CONF_FILE="<path>" \
+    PROM_EXTERNAL_URL="<url>" \
+    ./deploy.sh
+    ```
 
-   The param `PROM_CONFIG_FILE` points to your adapted configuration file.
+  The param `PROM_CONFIG_FILE` points to your adapted configuration file.
 
-   The parameter `PROM_EXTERNAL_URL` is the address under which prometheus
-   should be reachable from the internet. If using the *devopsadmin* component
-   for this, it will be `<external-devopsadmin-url>/prometheus/`
+  The parameter `PROM_EXTERNAL_URL` is the address under which prometheus
+  should be reachable from the internet. If using the *devopsadmin* component
+  for this, it will be `<external-devopsadmin-url>/prometheus/`
 
-   The optional parameter `APP_NAME` is the name that will be used to push
-   the application.
+  The optional parameter `APP_NAME` is the name that will be used to push
+  the application.
 
 If you want to send all logs to LogMe (ELK), you can bind the app to the
 appropriate service name (see [main README.md](../../README.md)):
