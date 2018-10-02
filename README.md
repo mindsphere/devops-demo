@@ -18,6 +18,9 @@ The demo consists of:
   - [Prometheus on CloudFoundry](devops/prometheus)
   - [Grafana on CloudFoundry](devops/grafana)
 
+Additionally, [tooling to ease ssh connectivity to running cf applications](tools/README.md)
+is provided.
+
 Please refer to the official MindSphere & CloudFoundry developer documentation
 for detailed information about the platform:
 
