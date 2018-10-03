@@ -79,7 +79,7 @@ const TodoServer = function() {
     // On API requests, expect a user identifier:
     // - local: use static identifier (same for all)
     // - mdsp: extract & use mdsp user identifier from jwt
-    app.use('/todo', (req, res, next) => {
+    app.use('/v1/', (req, res, next) => {
       if (process.env.VCAP_APPLICATION) {
         if (req.headers.authorization) {
           let splitAuthHeader = req.headers.authorization.split(' ');
@@ -153,7 +153,7 @@ const TodoServer = function() {
       }
     }));
 
-    app.post('/todo', (req, res) => {
+    app.post('/v1/todo', (req, res) => {
       req.body.user_id = getCurrentUserId(res);
 
       TodoModel.create(req.body)
@@ -166,7 +166,7 @@ const TodoServer = function() {
           });
     });
 
-    app.get('/todo', (req, res) => {
+    app.get('/v1/todo', (req, res) => {
       const userId = getCurrentUserId(res);
       TodoModel.find({ user_id: userId })
         .then(
@@ -178,7 +178,7 @@ const TodoServer = function() {
           });
     });
 
-    app.delete('/todo/:id', (req, res) => {
+    app.delete('/v1/todo/:id', (req, res) => {
       TodoModel.deleteOne(
         {
           _id: mongoose.Types.ObjectId(req.params.id),

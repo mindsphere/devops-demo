@@ -15,11 +15,11 @@ export class TodoService {
     private http: HttpClient) { }
 
   getTodos (): Observable<Todo[]> {
-    return this.http.get<Todo[]>('./todo');
+    return this.http.get<Todo[]>('./v1/todo');
   }
 
   addTodo (todo: Todo): Observable<String> {
-    return this.http.post('./todo', todo, {
+    return this.http.post('./v1/todo', todo, {
       responseType: 'text',
       headers: new HttpHeaders({ 'Content-Type': 'application/json;charset=UTF-8' })
     });
@@ -27,7 +27,7 @@ export class TodoService {
 
   deleteTodo (todo: Todo): Observable<String> {
     const _id = typeof todo === 'string' ? todo : todo._id;
-    const url = `./todo/${_id}`;
+    const url = `./v1/todo/${_id}`;
     return this.http.delete(url, {
       responseType: 'text'
     });

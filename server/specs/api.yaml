@@ -7,7 +7,7 @@ info:
 servers:
   - url: /
 paths:
-  /todo:
+  /v1/todo:
     get:
       summary: List todo tasks
       responses:
@@ -42,7 +42,7 @@ paths:
             text/plain:
               type: string
               enum: ["Bad Request"]
-  /todo/{id}:
+  /v1/todo/{id}:
     delete:
       summary: Remove single todo task
       parameters:
