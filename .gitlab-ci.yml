@@ -31,11 +31,12 @@ test:
     - yarn
     - yarn commitlint
     - yarn lint
-    - yarn license:all
     - yarn build --no-progress --prod
     - yarn build --no-progress
     - yarn test --no-progress --code-coverage
-    - cd server && yarn && cd ..
+    - yarn --cwd server
+    - yarn --cwd devops/devopsadmin
+    - yarn license:all
     - export BASE_URL=http://$(hostname -i):3000
     - yarn e2e
   artifacts:

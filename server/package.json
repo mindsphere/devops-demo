@@ -14,7 +14,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node server.js",
-    "license": "license-checker --onlyAllow 'MIT;Apache-2.0;ISC;BSD-3-Clause;WTFPL' --production"
+    "license": "license-checker --onlyAllow 'MIT; Apache-2.0; ISC;BSD-2-Clause; BSD-3-Clause; WTFPL; AFLv2.1; Unlicense' --production"
   },
   "private": true,
   "engines": {
