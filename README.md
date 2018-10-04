@@ -111,6 +111,14 @@ More information under: https://developer.mindsphere.io/concepts/concept-csp.htm
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app
 will automatically reload if you change any of the source files.
 
+### Live development server (with todo api server)
+
+1. Run the todo api server available on the `server/` directory. This will
+    start the api server on `http://localhost:3000`
+1. Run `yarn start`. Navigate to `http://localhost:4200/`. The app will proxy
+    api calls to `http://localhost:3000` and automatically reload if you change
+    any of the source files
+
 ### Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can
