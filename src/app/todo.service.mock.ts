@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 import { Injectable } from '@angular/core';
 import { Observable , of} from 'rxjs';
 import { Todo } from './todo';
+import { UserInfo } from './userinfo';
 
 @Injectable()
 export class TodoServiceMock {
@@ -25,5 +26,14 @@ export class TodoServiceMock {
 
   deleteTodo (todo: Todo): Observable<String> {
     return of('OK');
+  }
+
+  getMe (): Observable<UserInfo> {
+    const ME: UserInfo = {
+      id: '0000-1111',
+      name: 'John Doe',
+      email: 'john.doe@example.com'
+    };
+    return of(ME);
   }
 }

@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 info:
   title: Todo API
-  version: 0.1.0
+  version: 0.2.0
   license:
     name: MIT
 servers:
@@ -64,6 +64,22 @@ paths:
             text/plain:
               type: string
               enum: ["Bad Request"]
+  /v1/me:
+    get:
+      summary: Query personal information of the user perfoming the request
+      responses:
+        '200':
+          description: User data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+        '400':
+          description: Invalid request
+          content:
+            text/plain:
+              type: string
+              enum: ["Bad Request"]
   /health_check:
     get:
       summary: Reports whether the app is healthy or not. Checks availability of required services (e.g. db)
@@ -101,3 +117,19 @@ components:
       required:
         - _id
         - title
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: User identifier assigned by MindSphere
+        name:
+          type: string
+          description: User name
+        email:
+          type: string
+          description: User email
+        required:
+          - id
+          - name
+          - email

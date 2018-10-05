@@ -23,7 +23,7 @@ export class TodosComponent implements OnInit {
 
   get(): void {
     this.todoService.getTodos()
-    .subscribe(todos => this.todos = todos);
+      .subscribe(todos => this.todos = todos);
   }
 
   add(title: string): void {
