@@ -7,6 +7,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Todo } from './todo';
+import { UserInfo } from './userinfo';
 
 @Injectable({ providedIn: 'root' })
 export class TodoService {
@@ -31,5 +32,9 @@ export class TodoService {
     return this.http.delete(url, {
       responseType: 'text'
     });
+  }
+
+  getMe (): Observable<UserInfo> {
+    return this.http.get<UserInfo>('./v1/me');
   }
 }

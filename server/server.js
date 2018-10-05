@@ -57,7 +57,11 @@ const TodoServer = function() {
       console.log(`JWT expected issuer: ${process.env.JWT_ISSUER}`);
     }
 
-    const NON_MDSP_USER_ID = '<default>';
+    const NON_MDSP_USER = {
+      id: '0000-0000',
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+    };
 
     const jwksClient = jwksrsa({
       cache: true,
@@ -93,7 +97,11 @@ const TodoServer = function() {
               });
             }).then((token) => {
               if (token.user_id) {
-                res.locals.todo_user_id = token.user_id;
+                res.locals.todo_user = {
+                  id: token.user_id,
+                  name: token.user_name,
+                  email: token.email,
+                };
                 next();
               } else {
                 next('cannot find user id in token');
@@ -104,7 +112,7 @@ const TodoServer = function() {
           }
         }
       } else {
-        res.locals.todo_user_id = NON_MDSP_USER_ID;
+        res.locals.todo_user = NON_MDSP_USER;
         next();
       }
     });
@@ -154,7 +162,7 @@ const TodoServer = function() {
     }));
 
     app.post('/v1/todo', (req, res) => {
-      req.body.user_id = getCurrentUserId(res);
+      req.body.user_id = getCurrentUser(res).id;
 
       TodoModel.create(req.body)
         .then(
@@ -167,7 +175,7 @@ const TodoServer = function() {
     });
 
     app.get('/v1/todo', (req, res) => {
-      const userId = getCurrentUserId(res);
+      const userId = getCurrentUser(res).id;
       TodoModel.find({ user_id: userId })
         .then(
           (tasks) => {
@@ -182,7 +190,7 @@ const TodoServer = function() {
       TodoModel.deleteOne(
         {
           _id: mongoose.Types.ObjectId(req.params.id),
-          user_id: getCurrentUserId(res)
+          user_id: getCurrentUser(res).id,
         })
         .then(
           (success) => {
@@ -191,6 +199,10 @@ const TodoServer = function() {
           (error) => {
             res.sendStatus(400);
           });
+    });
+
+    app.get('/v1/me', (req, res) => {
+      res.json(getCurrentUser(res));
     });
 
     app.get('/health_check', (req, res) => {
@@ -208,11 +220,11 @@ const TodoServer = function() {
     });
   };
 
-  const getCurrentUserId = (res) => {
-    if (!res.locals.todo_user_id) {
-      console.error('unknown user id');
+  const getCurrentUser = (res) => {
+    if (!res.locals.todo_user) {
+      console.error('unknown user, no data available or unauthenticated');
     }
-    return res.locals.todo_user_id;
+    return res.locals.todo_user;
   };
 
   this.run = () => {

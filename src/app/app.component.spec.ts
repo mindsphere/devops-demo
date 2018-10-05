@@ -6,6 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { TodosComponent } from './todos/todos.component';
+import { UserInfoComponent } from './userinfo/userinfo.component';
 import { TodoServiceMock } from './todo.service.mock';
 import { TodoService } from './todo.service';
 
@@ -20,7 +21,8 @@ describe('AppComponent', () => {
       ],
       declarations: [
         AppComponent,
-        TodosComponent
+        TodosComponent,
+        UserInfoComponent
       ],
       providers: [
         { provide: TodoService, useClass: TodoServiceMock }

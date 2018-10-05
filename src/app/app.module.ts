@@ -10,6 +10,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { TodosComponent } from './todos/todos.component';
+import { UserInfoComponent } from './userinfo/userinfo.component';
 
 @NgModule({
   imports: [
@@ -19,7 +20,8 @@ import { TodosComponent } from './todos/todos.component';
   ],
   declarations: [
     AppComponent,
-    TodosComponent
+    TodosComponent,
+    UserInfoComponent
   ],
   bootstrap: [AppComponent]
 })
