@@ -10,7 +10,20 @@ const jwt = require('jsonwebtoken');
 const includes = require('lodash.includes');
 const proxy = require('express-http-proxy');
 
-const config = {mdsp: {appname: 'mdsp:core:im', scope: 'userIamAdmin'}};
+const config = {
+  mdsp: {
+    appname: 'mdsp:core:im',
+    scope: 'userIamAdmin'
+  },
+  tech_user: {
+    oauth_endpoint: process.env.TECH_USER_OAUTH_ENDPOINT,
+    client_id: process.env.TECH_USER_CLIENT_ID,
+    client_secret: process.env.TECH_USER_CLIENT_SECRET
+  }
+};
+
+// Technical user token, used for accessing the mindsphere API
+let technicalToken = null;
 
 // Middleware for checking the scopes in the user token
 app.use('/', function (req, res, next) {
@@ -43,6 +56,7 @@ const rootHtml = `
   <li><a href="/users/">/users/</a></li>
   <li><a href="/prometheus/">/prometheus/</a></li>
   <li><a href="/grafana/">/grafana/</a></li>
+  <li><a href="/notification/">/notification/</a></li>
 </ul>
 `;
 app.get('/', (req, res) => res.send(rootHtml));
@@ -58,7 +72,7 @@ app.get('/env/', function (req, res) {
 });
 
 app.get('/jwt/', function (req, res) {
-  let authorizationHeader = authHeader = req.get('authorization');
+  let authorizationHeader = req.get('authorization');
 
   if (authorizationHeader != null) {
     authorizationHeader = authorizationHeader.replace('Bearer ', '');
@@ -71,10 +85,10 @@ app.get('/jwt/', function (req, res) {
 });
 
 app.get('/users/', function (req, res) {
-  authHeader = req.get('authorization');
+  let authorizationHeader = req.get('authorization');
   request
   .get('https://gateway.eu1.mindsphere.io/api/im/v3/Users?attributes=meta,name,userName,active')
-  .set('Authorization', authHeader)
+  .set('Authorization', authorizationHeader)
   .set('Accept', 'application/json')
   .then(function(data) {
       res.json({
@@ -82,7 +96,7 @@ app.get('/users/', function (req, res) {
       });
   }).catch(err => {
       console.error(err.message, err.status);
-      res.status(err.status).json({ message: 'Failed to fetch users.'});
+      res.status(err.status).json({message: 'Failed to fetch users'});
   });
 });
 
@@ -101,6 +115,62 @@ app.use('/prometheus/', proxy(process.env.PROMETHEUS_URL, {
     return proxyReqOpts;
   }
 }));
+
+app.get('/notification/', (req, res) => {
+  // Obtain technical user token if not available
+  const obtainToken = new Promise((resolve, reject) => {
+    if (!technicalToken) {
+      request.post(config.tech_user.oauth_endpoint)
+        .auth(config.tech_user.client_id, config.tech_user.client_secret)
+        .send('grant_type=client_credentials')
+        .then(data => {
+          technicalToken = data.body.access_token;
+          console.log('Obtained technical user token');
+          resolve(technicalToken);
+        })
+        .catch(err => {
+          console.error(err.status, err.message);
+          res.status(err.status).json({message: 'Failed to obtain technical user token'});
+          reject();
+        });
+    } else {
+      console.log('Found cached token');
+      resolve(technicalToken);
+    }
+  });
+
+  // Call the notification api based on the token
+  // If it fails with 401 invalidate the token, otherwise fail
+  obtainToken.then((technicalToken) => {
+    const authHeader = `Bearer ${technicalToken}`;
+    const emailJson = {
+      body: {
+        message: 'A notification has been triggered from devopsadmin through MindSphere'
+      },
+      recipientsTo: 'mindsphere.devops@gmail.com',
+      from: 'devopsadmin',
+      subject: 'devopsadmin MindSphere notification'
+    };
+    request
+      .post('https://gateway.eu1.mindsphere.io/api/notification/v3/publisher/messages')
+      .set('Authorization', authHeader)
+      .send(emailJson)
+      .then(data => {
+        res.json(data.body);
+      })
+      .catch(err => {
+        // Invalidate technical user token if needed
+        if (err.status === 401) {
+          console.log('Invalidating technical user token');
+          technicalToken = null;
+        }
+        res.status(err.status).json({
+          status: err.status,
+          message: `Failed to send email: ${err.message}`
+        });
+      });
+  });
+});
 
 app.listen(process.env.PORT || 3000, function(){
   console.log('Express listening on port', this.address().port);
