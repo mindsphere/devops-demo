@@ -8,6 +8,8 @@
 # - CF_API
 # - CF_ACCESS_TOKEN
 # - CF_REFRESH_TOKEN
+# - CF_TECHUSER_CLIENT_ID
+# - CF_TECHUSER_CLIENT_SECRET
 # - JWKS_URI
 # - JWT_ISSUER
 
@@ -17,6 +19,11 @@
 # - npm_config_chromedriver_cdnurl
 # - https_proxy
 # - no_proxy
+
+stages:
+  - test
+  - deploy
+  - notify
 
 test:
   stage: test
@@ -44,6 +51,7 @@ test:
       junit:
         - coverage/*.xml
         - test-reports/*.xml
+
 mindsphere-dev:
   stage: deploy
   image: node:carbon
@@ -67,17 +75,18 @@ mindsphere-dev:
     - cf bind-service todo-dev todo-logme-dev
     - cf start todo-dev
   only:
-  - master
+    - master
+
 mindsphere-stage:
   stage: deploy
   image: node:carbon
   environment:
     name: stage
   before_script:
-  - curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx
-  - mv cf /usr/local/bin
-  - mkdir -p ~/.cf
-  - echo "{\"ConfigVersion\":3,\"Target\":\"$CF_API\",\"AccessToken\":\"bearer ${CF_ACCESS_TOKEN}\",\"RefreshToken\":\"${CF_REFRESH_TOKEN}\"}" > ~/.cf/config.json
+    - curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx
+    - mv cf /usr/local/bin
+    - mkdir -p ~/.cf
+    - echo "{\"ConfigVersion\":3,\"Target\":\"$CF_API\",\"AccessToken\":\"bearer ${CF_ACCESS_TOKEN}\",\"RefreshToken\":\"${CF_REFRESH_TOKEN}\"}" > ~/.cf/config.json
   script:
     - cf target -o "$CF_ORG" -s "$CF_SPACE_STAGE"
     - yarn
@@ -91,4 +100,10 @@ mindsphere-stage:
     - cf bind-service todo-stage todo-logme-stage
     - cf start todo-stage
   only:
-  - tags
+    - tags
+
+mindsphere-notify:
+  stage: notify
+  image: node:carbon
+  script:
+    - echo "test"
