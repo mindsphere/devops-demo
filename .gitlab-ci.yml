@@ -103,7 +103,7 @@ mindsphere-stage:
   only:
     - tags
 
-mindsphere-notify:
+.notify-common: &notify-common
   stage: notify
   image: node:carbon
   script:
@@ -123,4 +123,14 @@ mindsphere-notify:
         "from": "gitlab",
         "subject": "MindSphere deployment: '"${CI_ENVIRONMENT_NAME}"'"}
         '
-        https://gateway.eu1.mindsphere.io/api/notification/v3/publisher/messages
+        "${CF_API_PUBLISH_EMAIL_ENDPOINT}"
+
+notify-dev:
+  environment:
+    name: dev
+  <<: *notify-common
+
+notify-stage:
+  environment:
+    name: stage
+  <<: *notify-common
