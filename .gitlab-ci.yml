@@ -111,7 +111,7 @@ mindsphere-notify:
     - apt update && apt install jq -y
     - CF_TOKEN=$(curl -s -u "${CF_TECHUSER_CLIENT_ID}:${CF_TECHUSER_CLIENTSECRET}"
         -d "grant_type=client_credentials"
-        -X POST "${CF_TECHUSER_OAUTH_ENDPOINT}" | jq -re '.access_token')
+        -X POST "${CF_TECHUSER_OAUTH_ENDPOINT}" | jq -r -e '.access_token')
     - >-
         curl -s -X POST
         -H "Authorization: Bearer ${CF_TOKEN}"
