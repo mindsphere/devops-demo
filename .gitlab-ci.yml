@@ -10,6 +10,7 @@
 # - CF_REFRESH_TOKEN
 # - CF_TECHUSER_CLIENT_ID
 # - CF_TECHUSER_CLIENT_SECRET
+# - CF_TECHUSER_OAUTH_ENDPOINT
 # - JWKS_URI
 # - JWT_ISSUER
 
@@ -106,4 +107,8 @@ mindsphere-notify:
   stage: notify
   image: node:carbon
   script:
-    - echo "test"
+    - set -euo pipefail
+    - apt update && apt install jq -y
+    - CF_TOKEN=$(curl -s -u "${CF_TECHUSER_CLIENT_ID}:${CF_TECHUSER_CLIENTSECRET)" -d "grant_type=client_credentials" -X POST "${CF_TECHUSER_OAUTH_ENDPOINT}" | jq -re '.access_token')
+    - EMAIL_JSON="{\"body\":{\"message\":\"MindSphere deployment successful: ${CI_ENVIRONMENT_NAME}\"},\"recipientsTo\":\"mindsphere.devops@gmail.com\",\"from\":\"gitlab\",\"subject\":\"MindSphere deployment: ${CI_ENVIRONMENT_NAME}\"}"
+    - curl -s -H "Authorization: Bearer ${CF_TOKEN}" -X POST -d "$EMAIL_JSON" https://gateway.eu1.mindsphere.io/api/notification/v3/publisher/messages
