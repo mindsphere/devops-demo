@@ -109,6 +109,17 @@ mindsphere-notify:
   script:
     - set -euo pipefail
     - apt update && apt install jq -y
-    - CF_TOKEN=$(curl -s -u "${CF_TECHUSER_CLIENT_ID}:${CF_TECHUSER_CLIENTSECRET)" -d "grant_type=client_credentials" -X POST "${CF_TECHUSER_OAUTH_ENDPOINT}" | jq -re '.access_token')
-    - EMAIL_JSON="{\"body\":{\"message\":\"MindSphere deployment successful: ${CI_ENVIRONMENT_NAME}\"},\"recipientsTo\":\"mindsphere.devops@gmail.com\",\"from\":\"gitlab\",\"subject\":\"MindSphere deployment: ${CI_ENVIRONMENT_NAME}\"}"
-    - curl -s -H "Authorization: Bearer ${CF_TOKEN}" -X POST -d "$EMAIL_JSON" https://gateway.eu1.mindsphere.io/api/notification/v3/publisher/messages
+    - CF_TOKEN=$(curl -s -u "${CF_TECHUSER_CLIENT_ID}:${CF_TECHUSER_CLIENTSECRET)"
+        -d "grant_type=client_credentials"
+        -X POST "${CF_TECHUSER_OAUTH_ENDPOINT}" | jq -re '.access_token')
+    - >-
+        curl -s -H "Authorization: Bearer ${CF_TOKEN}" -X POST
+        -H "Content-Type: application/json"
+        --data '
+        {
+        "body":{"message":"MindSphere deployment successful: ${CI_ENVIRONMENT_NAME}"},
+        "recipientsTo":"mindsphere.devops@gmail.com",
+        "from":"gitlab",
+        "subject":"MindSphere deployment: ${CI_ENVIRONMENT_NAME}"}
+        '
+        https://gateway.eu1.mindsphere.io/api/notification/v3/publisher/messages
