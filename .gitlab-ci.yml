@@ -107,7 +107,7 @@ mindsphere-notify:
   stage: notify
   image: node:carbon
   script:
-    - set -euo pipefail
+    - set -eo pipefail
     - apt update && apt install jq -y
     - CF_TOKEN=$(curl -s -u "${CF_TECHUSER_CLIENT_ID}:${CF_TECHUSER_CLIENTSECRET}"
         -d "grant_type=client_credentials"
@@ -118,9 +118,9 @@ mindsphere-notify:
         -H "Content-Type: application/json"
         --data '
         {
-        "body":{"message":"MindSphere deployment successful: '"${CI_ENVIRONMENT_NAME}"'"},
-        "recipientsTo":"mindsphere.devops@gmail.com",
-        "from":"gitlab",
-        "subject":"MindSphere deployment: '"${CI_ENVIRONMENT_NAME}"'"}
+        "body": {"message": "MindSphere deployment successful: '"${CI_ENVIRONMENT_NAME}"'"},
+        "recipientsTo": "mindsphere.devops@gmail.com",
+        "from": "gitlab",
+        "subject": "MindSphere deployment: '"${CI_ENVIRONMENT_NAME}"'"}
         '
         https://gateway.eu1.mindsphere.io/api/notification/v3/publisher/messages
