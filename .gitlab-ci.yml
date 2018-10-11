@@ -11,8 +11,10 @@
 # - CF_TECHUSER_CLIENT_ID
 # - CF_TECHUSER_CLIENT_SECRET
 # - CF_TECHUSER_OAUTH_ENDPOINT
+# - CF_API_PUBLISH_EMAIL_ENDPOINT
 # - JWKS_URI
 # - JWT_ISSUER
+# - NOTIFICATION_EMAIL_ADDRESSES
 
 # Optional you can also set the following ones if you are behind a proxy
 # - npm_config_registry
@@ -119,7 +121,7 @@ mindsphere-stage:
         --data '
         {
         "body": {"message": "MindSphere deployment successful: '"${CI_ENVIRONMENT_NAME}"'"},
-        "recipientsTo": "mindsphere.devops@gmail.com",
+        "recipientsTo": "'"${NOTIFICATION_EMAIL_ADDRESSES}"'",
         "from": "gitlab",
         "subject": "MindSphere deployment: '"${CI_ENVIRONMENT_NAME}"'"}
         '
@@ -133,4 +135,6 @@ notify-dev:
 notify-stage:
   environment:
     name: stage
+  only:
+  - tags
   <<: *notify-common
