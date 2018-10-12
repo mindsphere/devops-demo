@@ -1,5 +1,7 @@
 # MindSphere DevOps Demo
 
+![TODO app](./screenshot.png)
+
 Close interaction of development and operations is essential to accelerate
 delivery of applications. This is a demo across the whole DevOps cycle with
 MindSphere, by using well known and widely used open source tools.
