@@ -41,7 +41,10 @@ const TodoServer = function() {
 
   const setupWebserver = (app) => {
     // Security handler
-    app.use(helmet());
+    // Disable X-XSS-Protection filter already set by the MindSphere Gateway
+    app.use(helmet({
+      xssFilter: false
+    }));
 
     app.use(bodyparser.json());
     app.use(bodyparser.urlencoded({ extended: false }));
