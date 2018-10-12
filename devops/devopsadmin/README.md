@@ -8,6 +8,12 @@ The following environment variables are recognized by the todo backend:
 |--------------|-------------|----------|
 | `PROMETHEUS_URL`   | Full url of to-be-proxied Prometheus server | yes | *empty* |
 | `GRAFANA_URL` | Full url of to-be-proxied Grafana server | yes |
+| `TECH_USER_OAUTH_ENDPOINT` | Full url of oauth endpoint to be used for technical user login | yes |
+| `TECH_USER_CLIENT_ID` | Technical user client id | yes |
+| `TECH_USER_CLIENT_SECRET` | Technical user client secret | yes |
+
+The Technical User is required to be able to send notifications with the
+`/notification` endpoint ([see the MindSphere documentation](https://developer.mindsphere.io/apis/advanced-notification/api-notification-overview.html#access)).
 
 ## Build and Run
 
@@ -20,12 +26,21 @@ yarn start
 
 Adapt the `PROMETHEUS_URL` and `GRAFANA_URL` variables to the internal
 CloudFoundry addresses of your to-be-proxied Prometheus and Grafana
-applications. Then push:
+applications.
+
+Also provide directly, or add as gitlab-ci protected variables, the values
+for `TECH_USER_OAUTH_ENDPOINT`, `TECH_USER_CLIENT_ID`, and
+`TECH_USER_CLIENT_SECRET`.
+
+Then push:
 
 ```sh
 APP_NAME="devopsadmin" \
 PROMETHEUS_URL="<internal-cf-prometheus-url>" \
 GRAFANA_URL="<internal-cf-grafana-url>" \
+TECH_USER_OAUTH_ENDPOINT="<technical-user-oauth-endpoint>" \
+TECH_USER_CLIENT_ID="<technical-user-client-id>" \
+TECH_USER_CLIENT_SECRET="<technical-user-client-secret>" \
 ./deploy.sh
 ```
 
