@@ -10,20 +10,11 @@ const jwt = require('jsonwebtoken');
 const includes = require('lodash.includes');
 const proxy = require('express-http-proxy');
 
-const config = {
-  mdsp: {
-    appname: 'mdsp:core:im',
-    scope: 'userIamAdmin'
-  },
-  tech_user: {
-    oauth_endpoint: process.env.TECH_USER_OAUTH_ENDPOINT,
-    client_id: process.env.TECH_USER_CLIENT_ID,
-    client_secret: process.env.TECH_USER_CLIENT_SECRET
-  }
-};
+const config = require('./config');
+const services = require('./services');
 
-// Technical user token, used for accessing the mindsphere API
-let technicalToken = null;
+const asyncHandler = (func) =>
+  (req, res, next) => Promise.resolve(func(req, res, next)).catch(next);
 
 // Middleware for checking the scopes in the user token
 app.use('/', function (req, res, next) {
@@ -56,7 +47,8 @@ const rootHtml = `
   <li><a href="/users/">/users/</a></li>
   <li><a href="/prometheus/">/prometheus/</a></li>
   <li><a href="/grafana/">/grafana/</a></li>
-  <li><a href="/notification/">/notification/</a></li>
+  <li><a href="/simple-notification/">/simple-notification/</a></li>
+  <li><a href="/complex-notification/">/complex-notification/</a></li>
 </ul>
 `;
 app.get('/', (req, res) => res.send(rootHtml));
@@ -116,61 +108,33 @@ app.use('/prometheus/', proxy(process.env.PROMETHEUS_URL, {
   }
 }));
 
-app.get('/notification/', (req, res) => {
-  // Obtain technical user token if not available
-  const obtainToken = new Promise((resolve, reject) => {
-    if (!technicalToken) {
-      request.post(config.tech_user.oauth_endpoint)
-        .auth(config.tech_user.client_id, config.tech_user.client_secret)
-        .send('grant_type=client_credentials')
-        .then(data => {
-          technicalToken = data.body.access_token;
-          console.log('Obtained technical user token');
-          resolve(technicalToken);
-        })
-        .catch(err => {
-          console.error(err.status, err.message);
-          res.status(err.status).json({message: 'Failed to obtain technical user token'});
-          reject();
-        });
-    } else {
-      console.log('Found cached token');
-      resolve(technicalToken);
-    }
-  });
+app.get('/simple-notification/', asyncHandler(async (req, res, next) => {
+  try {
+    const data = await services.notification
+      .sendSimpleNotification(process.env.NOTIFICATION_EMAIL);
+    res.json({
+      message: 'Notification sent',
+      result: data.body
+    });
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+}));
 
-  // Call the notification api based on the token
-  // If it fails with 401 invalidate the token, otherwise fail
-  obtainToken.then((technicalToken) => {
-    const authHeader = `Bearer ${technicalToken}`;
-    const emailJson = {
-      body: {
-        message: 'A notification has been triggered from devopsadmin through MindSphere'
-      },
-      recipientsTo: 'mindsphere.devops@gmail.com',
-      from: 'devopsadmin',
-      subject: 'devopsadmin MindSphere notification'
-    };
-    request
-      .post('https://gateway.eu1.mindsphere.io/api/notification/v3/publisher/messages')
-      .set('Authorization', authHeader)
-      .send(emailJson)
-      .then(data => {
-        res.json(data.body);
-      })
-      .catch(err => {
-        // Invalidate technical user token if needed
-        if (err.status === 401) {
-          console.log('Invalidating technical user token');
-          technicalToken = null;
-        }
-        res.status(err.status).json({
-          status: err.status,
-          message: `Failed to send email: ${err.message}`
-        });
-      });
-  });
-});
+app.get('/complex-notification/', asyncHandler(async (req, res, next) => {
+  try {
+    const data = await services.notification
+      .sendComplexNotification(process.env.NOTIFICATION_EMAIL, process.env.NOTIFICATION_MOBILE_NUMBER);
+    res.json({
+      message: 'Notification sent',
+      result: data.body
+    });
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+}));
 
 app.listen(process.env.PORT || 3000, function(){
   console.log('Express listening on port', this.address().port);

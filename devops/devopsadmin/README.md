@@ -32,6 +32,9 @@ Also provide directly, or add as gitlab-ci protected variables, the values
 for `TECH_USER_OAUTH_ENDPOINT`, `TECH_USER_CLIENT_ID`, and
 `TECH_USER_CLIENT_SECRET`.
 
+If you want to use the notification samples, provide an email on the variable
+`NOTIFICATION_EMAIL` and a mobile number on `NOTIFICATION_MOBILE_NUMBER`.
+
 Then push:
 
 ```sh
@@ -41,6 +44,8 @@ GRAFANA_URL="<internal-cf-grafana-url>" \
 TECH_USER_OAUTH_ENDPOINT="<technical-user-oauth-endpoint>" \
 TECH_USER_CLIENT_ID="<technical-user-client-id>" \
 TECH_USER_CLIENT_SECRET="<technical-user-client-secret>" \
+NOTIFICATION_EMAIL="<email-address>" \
+NOTIFICATION_MOBILE_NUMBER="<mobile-number>" \
 ./deploy.sh
 ```
 
