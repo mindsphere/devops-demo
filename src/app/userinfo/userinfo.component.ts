@@ -10,7 +10,8 @@ import { TodoService } from '../todo.service';
 
 @Component({
   selector: 'app-userinfo',
-  templateUrl: './userinfo.component.html'
+  templateUrl: './userinfo.component.html',
+  styleUrls: ['./userinfo.component.scss']
 })
 export class UserInfoComponent implements OnInit {
   userInfo: UserInfo;
