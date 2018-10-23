@@ -8,8 +8,13 @@
 # - CF_API
 # - CF_ACCESS_TOKEN
 # - CF_REFRESH_TOKEN
+# - CF_TECHUSER_CLIENT_ID
+# - CF_TECHUSER_CLIENT_SECRET
+# - CF_TECHUSER_OAUTH_ENDPOINT
+# - CF_API_PUBLISH_EMAIL_ENDPOINT
 # - JWKS_URI
 # - JWT_ISSUER
+# - NOTIFICATION_EMAIL_ADDRESSES
 
 # Optional you can also set the following ones if you are behind a proxy
 # - npm_config_registry
@@ -17,6 +22,11 @@
 # - npm_config_chromedriver_cdnurl
 # - https_proxy
 # - no_proxy
+
+stages:
+  - test
+  - deploy
+  - notify
 
 test:
   stage: test
@@ -44,6 +54,7 @@ test:
       junit:
         - coverage/*.xml
         - test-reports/*.xml
+
 mindsphere-dev:
   stage: deploy
   image: node:carbon
@@ -67,17 +78,18 @@ mindsphere-dev:
     - cf bind-service todo-dev todo-logme-dev
     - cf start todo-dev
   only:
-  - master
+    - master
+
 mindsphere-stage:
   stage: deploy
   image: node:carbon
   environment:
     name: stage
   before_script:
-  - curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx
-  - mv cf /usr/local/bin
-  - mkdir -p ~/.cf
-  - echo "{\"ConfigVersion\":3,\"Target\":\"$CF_API\",\"AccessToken\":\"bearer ${CF_ACCESS_TOKEN}\",\"RefreshToken\":\"${CF_REFRESH_TOKEN}\"}" > ~/.cf/config.json
+    - curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx
+    - mv cf /usr/local/bin
+    - mkdir -p ~/.cf
+    - echo "{\"ConfigVersion\":3,\"Target\":\"$CF_API\",\"AccessToken\":\"bearer ${CF_ACCESS_TOKEN}\",\"RefreshToken\":\"${CF_REFRESH_TOKEN}\"}" > ~/.cf/config.json
   script:
     - cf target -o "$CF_ORG" -s "$CF_SPACE_STAGE"
     - yarn
@@ -91,4 +103,40 @@ mindsphere-stage:
     - cf bind-service todo-stage todo-logme-stage
     - cf start todo-stage
   only:
+    - tags
+
+.notify-common: &notify-common
+  stage: notify
+  image: node:carbon
+  script:
+    - set -euo pipefail
+    - apt update && apt install jq -y
+    - CF_TOKEN=$(curl -s -u "${CF_TECHUSER_CLIENT_ID}:${CF_TECHUSER_CLIENT_SECRET}"
+        -d "grant_type=client_credentials"
+        -X POST "${CF_TECHUSER_OAUTH_ENDPOINT}" | jq -r -e '.access_token')
+    - >-
+        curl -s -X POST
+        -H "Authorization: Bearer ${CF_TOKEN}"
+        -H "Content-Type: application/json"
+        --data '
+        {
+        "body": {"message": "MindSphere devops-demo deployment successful: '"${CI_ENVIRONMENT_NAME}"'"},
+        "recipientsTo": "'"${NOTIFICATION_EMAIL_ADDRESSES}"'",
+        "from": "gitlab",
+        "subject": "MindSphere devops-demo deployment: '"${CI_ENVIRONMENT_NAME}"'"}
+        '
+        "${CF_API_PUBLISH_EMAIL_ENDPOINT}"
+
+notify-dev:
+  environment:
+    name: dev
+  only:
+  - master
+  <<: *notify-common
+
+notify-stage:
+  environment:
+    name: stage
+  only:
   - tags
+  <<: *notify-common
