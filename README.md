@@ -98,12 +98,17 @@ cf bind-service todo todo-logme
 cf start todo
 ```
 
-(*Only once*) in the MindSphere Developer Cockpit add an extra rule to the
-CSP policy to allow connecting to the OpenAPI specs hosted on
-`developer.mindsphere.io`:
+(*Only once*) in the MindSphere Developer Cockpit, some CSP policy adaptations
+are needed:
+
+- allow connections to the OpenAPI specs hosted on `developer.mindsphere.io`
+- allow connections to the piam endpoint of the gateway; this is required
+  for login redirects when the user session token expires
+
+Example (substitute `<your-tenant>` by your tenant identifier):
 
 ```
-default-src 'self' developer.mindsphere.io static.eu1.mindsphere.io;
+default-src 'self' <your-tenant>.piam.eu1.mindsphere.io developer.mindsphere.io static.eu1.mindsphere.io;
 ```
 
 More information under: https://developer.mindsphere.io/concepts/concept-csp.html
