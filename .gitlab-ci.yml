@@ -105,6 +105,8 @@ mindsphere-stage:
   only:
     - tags
 
+# Authentication based on flow:
+# https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html
 .notify-common: &notify-common
   stage: notify
   image: node:carbon
