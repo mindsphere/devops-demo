@@ -35,17 +35,17 @@ cf-ssh.sh -v -a my-app
 
 ### How to open a local tunnel to a remote application port
 
-The following command tunnels local port `8081` to remote port `8080`:
+The following command tunnels local port `8080` to remote port `80`:
 
 ```sh
-cf-ssh.sh -v -a my-app -- -L8080:localhost:8080
+cf-ssh.sh -v -a my-app -- -L8080:localhost:80
 ```
 
 Multiple ports are also possible, the options after `--` are just standard
 OpenSSH options:
 
 ```sh
-cf-ssh.sh -v -a my-app -- -L8080:localhost:8080 -L8081:localhost:8081
+cf-ssh.sh -v -a my-app -- -L8080:localhost:80 -L8081:localhost:8081
 ```
 
 ### How to open a local tunnel to a remote db service
