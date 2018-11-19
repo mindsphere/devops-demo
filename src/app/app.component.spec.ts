@@ -12,7 +12,7 @@ import { TodoService } from './todo.service';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
-    (<any>window)._msb = { init: () => {} };
+    (<any>window)._mdsp = { init: () => {} };
     TestBed.configureTestingModule({
       imports: [
         BrowserModule,
