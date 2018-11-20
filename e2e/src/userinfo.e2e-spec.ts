@@ -4,7 +4,6 @@ SPDX-License-Identifier: MIT
 */
 
 import { browser, by, element } from 'protractor';
-import { protractor } from 'protractor/built/ptor';
 
 describe('UserInfo display', () => {
 

@@ -1,6 +1,6 @@
 {
   "name": "todo-backend",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The backend of a simple todo app with a MongoDB backend",
   "repository": {
     "type": "git",

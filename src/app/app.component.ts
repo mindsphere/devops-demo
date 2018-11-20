@@ -4,7 +4,7 @@ SPDX-License-Identifier: MIT
 */
 
 import { Component } from '@angular/core';
-declare let _msb: any;
+declare let _mdsp: any;
 
 @Component({
   selector: 'app-root',
@@ -15,9 +15,11 @@ export class AppComponent {
   slogan = 'a minimal todo list';
 
   constructor() {
-    _msb.init({
-      title: `${this.title}, ${this.slogan}`,
-      initialize: true
+    _mdsp.init({
+      title: 'DevOps Demo',
+      appId: '_mdspcontent',
+      initialize: true,
+      appInfoPath: '/assets/mdsp-app-info.json'
     });
   }
 }

@@ -1,0 +1,21 @@
+{
+  "displayName": "MindSphere DevOps Demo",
+  "appVersion": "0.2.0",
+  "appCopyright": "© Siemens AG 2018",
+  "links": {
+    "default": [
+      {
+        "type": "www",
+        "name": "Todo - Source Code",
+        "value": "https://gitlab.com/mindsphere/devops-demo"
+      }
+    ],
+    "de": [
+      {
+        "type": "www",
+        "name": "Todo - Quell Code",
+        "value": "https://gitlab.com/mindsphere/devops-demo"
+      }
+    ]
+  }
+}
