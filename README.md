@@ -149,6 +149,18 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 To get more help on the Angular CLI use `ng help` or go check out the
 [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
 
+## Known Issues / Limitations
+
+- The [gitlab-ci](.gitlab-ci.yml) integration requires manually setting
+  authentication with access and refresh tokens available as protected
+  [CI/CD Gitlab Variables](https://docs.gitlab.com/ce/ci/variables/),
+  and they need to be renewed every 30 days. This can be copied directly from
+  your CloudFoundry CLI `~/.cf/config.json` file after successful `cf login`.
+- Storage for [Prometheus](devops/prometheus) is currently transient, pending
+  support for some kind of dynamic persistent storage for apps, or direct
+  support for Prometheus in MindSphere.
+- Prometheus metrics http endpoints are read-only but not protected.
+
 ## License
 
 This project is licensed under the MIT License
