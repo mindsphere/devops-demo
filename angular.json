@@ -28,6 +28,14 @@
             "scripts": []
           },
           "configurations": {
+            "mdsplocal": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/.environment.mdsplocal.ts"
+                }
+              ]
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -50,9 +58,13 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "todo:build"
+            "browserTarget": "todo:build",
+            "proxyConfig": "proxy.conf.js"
           },
           "configurations": {
+            "mdsplocal": {
+              "browserTarget": "todo:build:mdsplocal"
+            },
             "production": {
               "browserTarget": "todo:build:production"
             }

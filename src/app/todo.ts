@@ -4,6 +4,6 @@ SPDX-License-Identifier: MIT
 */
 
 export class Todo {
-    _id?: string;
-    title: string;
+  _id?: string;
+  title: string;
 }

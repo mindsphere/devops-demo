@@ -7,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
 
 import { UserInfo } from '../userinfo';
 import { TodoService } from '../todo.service';
+import { MindSphereService } from '../mindsphere.service';
+import { TenantInfo } from '../tenantinfo';
 
 @Component({
   selector: 'app-userinfo',
@@ -15,8 +17,11 @@ import { TodoService } from '../todo.service';
 })
 export class UserInfoComponent implements OnInit {
   userInfo: UserInfo;
+  tenantInfo: TenantInfo;
 
-  constructor(private todoService: TodoService) { }
+  constructor(
+    private todoService: TodoService,
+    private mindSphereService: MindSphereService) {}
 
   ngOnInit() {
     this.get();
@@ -25,5 +30,7 @@ export class UserInfoComponent implements OnInit {
   get(): void {
     this.todoService.getMe()
       .subscribe(userInfo => this.userInfo = userInfo);
+    this.mindSphereService.getTenantInfo()
+      .subscribe(tenantInfo => this.tenantInfo = tenantInfo);
   }
 }

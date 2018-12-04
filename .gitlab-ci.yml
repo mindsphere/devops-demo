@@ -41,8 +41,8 @@ test:
     - yarn
     - yarn commitlint
     - yarn lint
-    - yarn build --no-progress --prod
-    - yarn build --no-progress
+    - yarn build:prod --no-progress
+    - yarn build:dev --no-progress
     - yarn test --no-progress --code-coverage
     - yarn --cwd server
     - yarn --cwd devops/devopsadmin
@@ -68,7 +68,7 @@ mindsphere-dev:
   script:
     - cf target -o "$CF_ORG" -s "$CF_SPACE_DEV"
     - yarn
-    - yarn build --no-progress --prod
+    - yarn build:prod --no-progress
     - cd server
     - yarn
     - cf push todo-dev --no-start
@@ -93,7 +93,7 @@ mindsphere-stage:
   script:
     - cf target -o "$CF_ORG" -s "$CF_SPACE_STAGE"
     - yarn
-    - yarn build --no-progress --prod
+    - yarn build:prod --no-progress
     - cd server
     - yarn
     - cf push todo-stage --no-start

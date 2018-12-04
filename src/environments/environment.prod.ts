@@ -1,3 +1,7 @@
 export const environment = {
-  production: true
+  production: true,
+  mdsp: {
+    xsrfTokenHeader: null,
+    sessionCookie: null
+  }
 };

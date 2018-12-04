@@ -15,8 +15,10 @@ The demo consists of:
 - a simple todo app using the MEAN (MongoDB, Express.js, Angular, Node.js) stack
   - Angular App (root folder)
   - [Backend](server)
+  - local Angular dev server setup that proxies requests to MindSphere,
+    allowing local development
 - a devops admin backend that provides access to prometheus and grafana
-  - [devopsadmin app](devops/devopsadmin/)
+  - [devopsadmin app](devops/devopsadmin)
   - [Prometheus on CloudFoundry](devops/prometheus)
   - [Grafana on CloudFoundry](devops/grafana)
 
@@ -42,15 +44,64 @@ The following environment variables are recognized by the todo backend:
 | `JWKS_URI`   | JWKS endpoint, contains key used for validating auth tokens     | only on MindSphere deploy | *empty* |
 | `JWT_ISSUER` | Expected issuer of the token to be found in the JWT `iss` field | only on MindSphere deploy | *empty* |
 
-### Local run
+### Local Development
+
+This project includes support for running the web interface in local
+development mode connected to MindSphere. In order to reach the MindSphere
+APIs you need to provide user credentials for your user.
+
+The local Angular development server is setup to use a local proxy based on
+WebPack that forwards api requests:
+
+- `/api/**` will be forwarded to `https://gateway.eu1.mindsphere.io`  
+  This applies to all [MindSphere API calls](https://developer.mindsphere.io/apis/index.html).
+  You can check the [MindSphere service source](src/app/mindsphere.service.ts)
+  for a sample.
+- `/v1/**` will be forwarded to `http://localhost:3000`  
+  This applies to all local Node.js todo backend server API calls. You can
+  start the backend locally from the `server/` directory.
+
+To be able to reach the MindSphere APIs from your local environment you need
+to setup authentication credentials for the MindSphere `/api/**` endpoints.
+Please note the next steps are only needed if you call directly MindSphere
+APIs from your frontend. They are not needed to interact with the local
+todo API backend.
+
+1. As a first one-time step you need to register your application in the
+    MindSphere Developer Cockpit by following the [official documentation](https://developer.mindsphere.io/howto/howto-cf-running-app.html#configure-the-application-via-the-developer-cockpit)
+    - Create the application
+    - Register endpoints
+    - **IMPORTANT** Configure the [application Roles & Scopes](https://developer.mindsphere.io/howto/howto-cf-running-app.html#configure-the-application-roles-scopes)
+      Your application will only have access to the MindSphere APIs that are
+      configured in this step
+    - Register the application
+1. Access your new application with a web browser and authenticate. On
+    successful authentication the MindSphere gateway will setup some session
+    cookies. Use the browser developer tools to copy the cookies `SESSION`
+    and `XSRF-TOKEN`
+1. Create a file `src/environments/.environment.ts` (notice the dot in the
+    name) with the same contents as `src/environments/environment.ts`. This
+    file will be ignored by git
+1. In this file set the variables `xsrfTokenHeader` and `sessionCookie`
+    to the values copied before
+1. These [credentials will be valid](https://developer.mindsphere.io/concepts/concept-gateway-url-schemas.html#restrictions)
+    for a maximum of 12 hours and have an inactivity timeout of 30 minutes.
+    When they expire, you can execute the same flow again by logging in to
+    MindSphere
+
+Then start the local todo backend and Angular dev server. You will be able
+to enjoy live reload of changes done in the source code of the Angular
+app:
 
 ```sh
 # Start mongodb server
 docker run -p 27017:27017 mongo
-# Build static angular ap and start nodejs server
-yarn
-yarn build --prod
-cd server
+
+# Start nodejs backend
+yarn --cwd server
+yarn --cwd server start
+
+# Start Angular dev server
 yarn
 yarn start
 ```
@@ -86,7 +137,8 @@ bind the services:
 ```sh
 # Build static angular app
 yarn
-yarn build --no-progress --prod
+yarn build:prod --no-progress
+
 # Push nodejs server
 cd server
 yarn

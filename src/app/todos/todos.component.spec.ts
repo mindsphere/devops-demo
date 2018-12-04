@@ -5,6 +5,7 @@ SPDX-License-Identifier: MIT
 
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
 
 import { TodosComponent } from './todos.component';
 import { TodoServiceMock } from '../todo.service.mock';
@@ -18,9 +19,10 @@ describe('TodosComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ TodosComponent ],
       providers: [ TodoService,
-        { provide: TodoService, useClass: TodoServiceMock }
+        { provide: TodoService, useClass: TodoServiceMock },
+        CookieService
       ],
-    schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA]
     })
     .compileComponents();
   }));

@@ -1,3 +1,4 @@
 <nav class="navbar navbar-dark bg-dark mt-5">
-  <div *ngIf="userInfo" class="navbar-expand m-auto navbar-text">Welcome {{userInfo.email}}</div>
+  <div *ngIf="userInfo" class="navbar-expand m-auto navbar-text">Welcome <span class="text-info">{{userInfo.email}}</span></div>
+  <div *ngIf="tenantInfo" class="navbar-text">Your tenant is <span class="text-info">{{tenantInfo.displayName}}</span></div>
 </nav>
