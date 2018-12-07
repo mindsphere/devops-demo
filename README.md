@@ -79,7 +79,7 @@ todo API backend.
     successful authentication the MindSphere gateway will setup some session
     cookies. Use the browser developer tools to copy the cookies `SESSION`
     and `XSRF-TOKEN`
-1. Create a file `src/environments/.environment.ts` (notice the dot in the
+1. Create a file `src/environments/.environment.mdsplocal.ts` (notice the dot in the
     name) with the same contents as `src/environments/environment.ts`. This
     file will be ignored by git
 1. In this file set the variables `xsrfTokenHeader` and `sessionCookie`
