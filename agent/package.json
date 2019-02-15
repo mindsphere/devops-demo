@@ -1,0 +1,22 @@
+{
+  "name": "devops-agent",
+  "version": "0.1.0",
+  "description": "Sample MindConnect NodeJS Agent",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Diego Louzán <diego.louzan.ext@siemens.com>",
+  "contributors": [
+    "Roger Meier <r.meier@siemens.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": "^8.11.1",
+    "npm": "^5.6.0"
+  },
+  "dependencies": {
+    "@mindconnect/mindconnect-nodejs": "^3.2.0"
+  }
+}
