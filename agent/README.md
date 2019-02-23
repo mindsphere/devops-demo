@@ -17,10 +17,14 @@ It's required to create two assets for this to work:
    define all the Aspects again in the agent, and then need to map them to the
    actual values in the first Asset
 
-Also note that files & events can be uploaded to any of the two Assets, which
-seems a bit weird; the data points can *only* be uploaded to the Asset, so we
-could end up in the situation that we have some uploaded data in the Asset
-and other in the Agent.
+The timeseries data in the MindSphere can be mapped from an agent to one or multiple
+assets. This is useful for example in scenarios where you have e.g. an environment
+temperature sensor data and you want to assign that timeseries to all the assets
+which are in the room.
 
-Probably the best option is to keep everything in the actual Asset, not the
-Agent. The Agent has other interesting data though, like the *Online Status*
+The files and the events don't require mappings and they can be assigned directly
+to the assets.
+
+It is in most cases the best option to keep everything in the actual Asset and
+to not upload any data to the Agent. The Agent has other interesting data though,
+like the *Online Status*

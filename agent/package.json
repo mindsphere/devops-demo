@@ -17,6 +17,6 @@
     "npm": "^5.6.0"
   },
   "dependencies": {
-    "@mindconnect/mindconnect-nodejs": "^3.2.0"
+    "@mindconnect/mindconnect-nodejs": "^3.3.0"
   }
 }
