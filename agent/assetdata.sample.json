@@ -1,0 +1,16 @@
+{
+  "assetId": "<changeme>",
+  "dataPoints": {
+    "environment": {
+      "temperatureId": "<changeme>",
+      "humidityId": "<changeme>",
+      "pressureId": "<changeme>"
+    },
+    "vibration": {
+      "accelerationId": "<changeme>",
+      "displacementId": "<changeme>",
+      "frequencyId": "<changeme>",
+      "velocityId": "<changeme>"
+    }
+  }
+}

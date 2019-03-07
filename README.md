@@ -21,6 +21,8 @@ The demo consists of:
   - [devopsadmin app](devops/devopsadmin)
   - [Prometheus on CloudFoundry](devops/prometheus)
   - [Grafana on CloudFoundry](devops/grafana)
+- a [sample agent](agent) that can be used to simulate an actual device sending
+  IoT data to the MindSphere APIs
 
 Additionally, [tooling to ease ssh connectivity to running cf applications](tools/README.md)
 is provided.
