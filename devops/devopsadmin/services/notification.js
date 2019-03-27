@@ -14,6 +14,8 @@ const authData = {
   }
 };
 
+const techUserOauthEndpoint = `https://${config.mdsp.tenant}.piam.${config.mdsp.region}.mindsphere.io/oauth/token`;
+
 const authenticate = async () => {
   let technicalToken = authData.technicalUser.token;
   let expiresAt = authData.technicalUser.expiresAt;
@@ -25,7 +27,7 @@ const authenticate = async () => {
     console.log('Found cached token');
   } else {
     // Expired, obtain a new token
-    technicalToken = await request.post(config.tech_user.oauth_endpoint)
+    technicalToken = await request.post(techUserOauthEndpoint)
       .auth(config.tech_user.client_id, config.tech_user.client_secret)
       .send('grant_type=client_credentials')
       .then(data => {
@@ -45,7 +47,7 @@ const authenticate = async () => {
 
 const findAddressTypes = async (token) => {
   const addressTypes = await request
-    .get('https://gateway.eu1.mindsphere.io/api/notification/v3/recipient/addresstype')
+    .get(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/recipient/addresstype`)
     .set('Authorization', `Bearer ${token}`)
     .then(res => { return res.body; });
   console.log('addressTypes:', JSON.stringify(addressTypes));
@@ -54,7 +56,7 @@ const findAddressTypes = async (token) => {
 
 const findCommunicationChannels = async (token) => {
   const communicationChannels = await request
-    .get('https://gateway.eu1.mindsphere.io/api/notification/v3/communicationchannel/')
+    .get(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/communicationchannel/`)
     .set('Authorization', `Bearer ${token}`)
     .then(res => { return res.body; });
   console.log('communicationChannels:', JSON.stringify(communicationChannels));
@@ -63,7 +65,7 @@ const findCommunicationChannels = async (token) => {
 
 const findParamTypes = async (token) => {
   const paramTypes = await request
-    .get('https://gateway.eu1.mindsphere.io/api/notification/v3/paramtype/')
+    .get(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/paramtype/`)
     .set('Authorization', `Bearer ${token}`)
     .then(res => { return res.body; });
   console.log('paramTypes:', JSON.stringify(paramTypes));
@@ -87,7 +89,7 @@ const findOrCreateRecipients = async (token, recipientEmail, recipientMobileNumb
   };
 
   const recipient1List = await request
-    .post('https://gateway.eu1.mindsphere.io/api/notification/v3/recipient/search')
+    .post(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/recipient/search`)
     .set('Authorization', `Bearer ${token}`)
     .send({ name: recipient1Name })
     .then(res => { return res.body; });
@@ -97,7 +99,7 @@ const findOrCreateRecipients = async (token, recipientEmail, recipientMobileNumb
     recipientIds.push(recipient1List[0].recipientid);
   } else {
     const recipient1Id = await request
-      .post('https://gateway.eu1.mindsphere.io/api/notification/v3/recipient/')
+      .post(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/recipient/`)
       .set('Authorization', `Bearer ${token}`)
       .send(recipient1Json)
       .then(res => { return res.body; });
@@ -118,7 +120,7 @@ const findOrCreateRecipients = async (token, recipientEmail, recipientMobileNumb
   };
 
   const recipient2List = await request
-    .post('https://gateway.eu1.mindsphere.io/api/notification/v3/recipient/search')
+    .post(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/recipient/search`)
     .set('Authorization', `Bearer ${token}`)
     .send({ name: recipient2Name })
     .then(res => { return res.body; });
@@ -128,7 +130,7 @@ const findOrCreateRecipients = async (token, recipientEmail, recipientMobileNumb
     recipientIds.push(recipient2List[0].recipientid);
   } else {
     const recipient2Id = await request
-      .post('https://gateway.eu1.mindsphere.io/api/notification/v3/recipient/')
+      .post(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/recipient/`)
       .set('Authorization', `Bearer ${token}`)
       .send(recipient2Json)
       .then(res => { return res.body; });
@@ -150,7 +152,7 @@ const findOrCreateRecipientGroup = async (token, recipientIds) => {
   };
 
   const recipientGroupList = await request
-    .post('https://gateway.eu1.mindsphere.io/api/notification/v3/recipient/recipientgroup/search')
+    .post(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/recipient/recipientgroup/search`)
     .set('Authorization', `Bearer ${token}`)
     .send({ name: recipientGroupName })
     .then(res => { return res.body; });
@@ -161,7 +163,7 @@ const findOrCreateRecipientGroup = async (token, recipientIds) => {
     recipientGroupId = recipientGroupList[0].groupId;
   } else {
     const recipientGroupResponse = await request
-      .post('https://gateway.eu1.mindsphere.io/api/notification/v3/recipient/recipientgroup')
+      .post(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/recipient/recipientgroup`)
       .set('Authorization', `Bearer ${token}`)
       .send(recipientGroupJson)
       .then(res => { return res.body; });
@@ -202,7 +204,7 @@ const findOrCreateTemplateSet = async (token) => {
   };
 
   const templateSetList = await request
-    .get('https://gateway.eu1.mindsphere.io/api/notification/v3/template/templatesets')
+    .get(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/template/templatesets`)
     .set('Authorization', `Bearer ${token}`)
     .query({ templatesetname: templateSetName })
     .then(res => { return res.body; });
@@ -213,7 +215,7 @@ const findOrCreateTemplateSet = async (token) => {
     templateSet = templateSetList[0];
   } else {
     const templateSetResponse = await request
-      .post('https://gateway.eu1.mindsphere.io/api/notification/v3/template/')
+      .post(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/template/`)
       .set('Authorization', `Bearer ${token}`)
       .field('templateInfo', JSON.stringify(templateInfo))
       .attach('templateFiles', __dirname + '/templateEmail.html')
@@ -253,7 +255,7 @@ const findOrCreateCommunicationCategory = async (token, recipientGroupId, templa
   };
 
   const commCategoryList = await request
-    .get('https://gateway.eu1.mindsphere.io/api/notification/v3/communicationcategories/')
+    .get(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/communicationcategories/`)
     .set('Authorization', `Bearer ${token}`)
     .then(res => { return res.body.filter(c => c.msgCategoryName === commCategoryName); });
 
@@ -263,7 +265,7 @@ const findOrCreateCommunicationCategory = async (token, recipientGroupId, templa
     commCategoryId = commCategoryList[0].msgCategoryId;
   } else {
     const commCategoryResponse = await request
-      .post('https://gateway.eu1.mindsphere.io/api/notification/v3/communicationcategories/')
+      .post(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/communicationcategories/`)
       .set('Authorization', `Bearer ${token}`)
       .send(commCategoryJson)
       .then(res => { return res.body; });
@@ -286,7 +288,7 @@ const sendSimpleNotification = async (recipientEmail) => {
 
   const technicalToken = await authenticate();
   return await request
-    .post('https://gateway.eu1.mindsphere.io/api/notification/v3/publisher/messages')
+    .post(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/publisher/messages`)
     .set('Authorization', `Bearer ${technicalToken}`)
     .send(messageJson);
 };
@@ -315,7 +317,7 @@ const sendComplexNotification = async (recipientEmail, recipientMobileNumber) =>
 
   // Trigger actual message delivery to both email and mobile
   return await request
-    .post('https://gateway.eu1.mindsphere.io/api/notification/v3/publisher/messages')
+    .post(`https://gateway.${config.mdsp.region}.mindsphere.io/api/notification/v3/publisher/messages`)
     .set('Authorization', `Bearer ${technicalToken}`)
     .send(messageJson);
 };

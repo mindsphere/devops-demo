@@ -16,6 +16,18 @@ const services = require('./services');
 const asyncHandler = (func) =>
   (req, res, next) => Promise.resolve(func(req, res, next)).catch(next);
 
+const setupConfig = () => {
+  if (!process.env.MDSP_TENANT) throw new Error('missing MDSP_TENANT configuration');
+  if (!process.env.MDSP_REGION) throw new Error('missing MDSP_REGION configuration');
+  if (!process.env.PROMETHEUS_URL) throw new Error('missing PROMETHEUS_URL configuration');
+  if (!process.env.GRAFANA_URL) throw new Error('missing GRAFANA_URL configuration');
+  if (!process.env.TECH_USER_CLIENT_ID) throw new Error('missing TECH_USER_CLIENT_ID configuration');
+  if (!process.env.TECH_USER_CLIENT_SECRET) throw new Error('missing TECH_USER_CLIENT_SECRET configuration');
+  if (!process.env.NOTIFICATION_EMAIL) throw new Error('missing NOTIFICATION_EMAIL configuration');
+  if (!process.env.NOTIFICATION_MOBILE_NUMBER) throw new Error('missing NOTIFICATION_MOBILE_NUMBER configuration');
+};
+setupConfig();
+
 // Middleware for checking the scopes in the user token
 app.use('/', function (req, res, next) {
   let scopes = [];
@@ -79,7 +91,7 @@ app.get('/jwt/', function (req, res) {
 app.get('/users/', function (req, res) {
   let authorizationHeader = req.get('authorization');
   request
-  .get('https://gateway.eu1.mindsphere.io/api/im/v3/Users?attributes=meta,name,userName,active')
+  .get(`https://gateway.${config.mdsp.region}.mindsphere.io/api/im/v3/Users?attributes=meta,name,userName,active`)
   .set('Authorization', authorizationHeader)
   .set('Accept', 'application/json')
   .then(function(data) {

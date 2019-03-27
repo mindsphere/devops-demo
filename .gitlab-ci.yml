@@ -4,7 +4,6 @@
 # The following CI/CD variables are required:
 # - CF_ORG
 # - CF_SPACE_DEV
-# - CF_SPACE_STAGE
 # - CF_API
 # - CF_ACCESS_TOKEN
 # - CF_REFRESH_TOKEN
@@ -12,11 +11,11 @@
 # - CF_TECHUSER_CLIENT_SECRET
 # - CF_TECHUSER_OAUTH_ENDPOINT
 # - CF_API_PUBLISH_EMAIL_ENDPOINT
-# - JWKS_URI
-# - JWT_ISSUER
+# - MDSP_TENANT
+# - MDSP_REGION
 # - NOTIFICATION_EMAIL_ADDRESSES
 
-# Optional you can also set the following ones if you are behind a proxy
+# Optionally you can also set the following ones if you are behind a proxy
 # - npm_config_registry
 # - npm_config_sass_binary_site
 # - npm_config_chromedriver_cdnurl
@@ -37,6 +36,9 @@ test:
   services:
     - selenium/standalone-chrome:3.5.2
     - mongo:3.2
+  before_script:
+    - apt-get update
+    - apt-get -y install zip
   script:
     - yarn
     - yarn commitlint
@@ -49,13 +51,14 @@ test:
     - yarn license:all
     - export BASE_URL=http://$(hostname -i):3000
     - yarn e2e
+    - yarn mdsp:zip
   artifacts:
     reports:
       junit:
         - coverage/*.xml
         - test-reports/*.xml
 
-mindsphere-dev:
+mindsphere:
   stage: deploy
   image: node:carbon
   environment:
@@ -69,44 +72,15 @@ mindsphere-dev:
     - cf target -o "$CF_ORG" -s "$CF_SPACE_DEV"
     - yarn
     - yarn build:prod --no-progress
-    - cd server
-    - yarn
-    - cf push todo-dev --no-start
-    - cf set-env todo-dev JWKS_URI "${JWKS_URI}"
-    - cf set-env todo-dev JWT_ISSUER "${JWT_ISSUER}"
-    - cf bind-service todo-dev todo-mongodb-dev
-    - cf bind-service todo-dev todo-logme-dev
-    - cf start todo-dev
+    - yarn --cwd server
+    - cf push --var mdspTenant="$MDSP_TENANT" --var mdspRegion="$MDSP_REGION"
   only:
     - master
 
-mindsphere-stage:
-  stage: deploy
-  image: node:carbon
-  environment:
-    name: stage
-  before_script:
-    - curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx
-    - mv cf /usr/local/bin
-    - mkdir -p ~/.cf
-    - echo "{\"ConfigVersion\":3,\"Target\":\"$CF_API\",\"AccessToken\":\"bearer ${CF_ACCESS_TOKEN}\",\"RefreshToken\":\"${CF_REFRESH_TOKEN}\"}" > ~/.cf/config.json
-  script:
-    - cf target -o "$CF_ORG" -s "$CF_SPACE_STAGE"
-    - yarn
-    - yarn build:prod --no-progress
-    - cd server
-    - yarn
-    - cf push todo-stage --no-start
-    - cf set-env todo-stage JWKS_URI "${JWKS_URI}"
-    - cf set-env todo-stage JWT_ISSUER "${JWT_ISSUER}"
-    - cf bind-service todo-stage todo-mongodb-stage
-    - cf bind-service todo-stage todo-logme-stage
-    - cf start todo-stage
-  only:
-    - tags
-
 # Authentication based on flow:
 # https://developer.mindsphere.io/howto/howto-selfhosted-api-access.html
+# The value of `CF_API_PUBLISH_EMAIL_ENDPOINT` should be e.g.
+#   https://gateway.eu1.mindsphere.io/api/notification
 .notify-common: &notify-common
   stage: notify
   image: node:carbon
@@ -129,16 +103,9 @@ mindsphere-stage:
         '
         "${CF_API_PUBLISH_EMAIL_ENDPOINT}"
 
-notify-dev:
+notify:
   environment:
     name: dev
   only:
-  - master
-  <<: *notify-common
-
-notify-stage:
-  environment:
-    name: stage
-  only:
-  - tags
+    - master
   <<: *notify-common

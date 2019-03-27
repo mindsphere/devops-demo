@@ -1,0 +1,29 @@
+# MindSphere tenant identifier
+mdspTenant: "<tenant>"
+
+# Mindsphere region identifier
+mdspRegion: "<region>"
+
+# MindSphere technical user credentials id
+techUserClientId: "<clientId>"
+
+# MindSphere technical user credentials secret
+techUserClientSecret: "<clientSecret>"
+
+# Recipient email address used for notifications triggered from devopsadmin
+notificationEmail: "<notification@example.com>"
+
+# Recipient mobile number used for notifications triggered from devopsadmin
+# Uses E.164 format
+notificationMobileNumber: "<+41999999999>"
+
+# Address under which prometheus will be reachable from the internet
+# <external-devopsadmin-url>/prometheus/
+promExternalUrl: "<https://<tenant>-devopsadmin-<tenant>.<region>.mindsphere.io/prometheus/>"
+
+# Full grafana database service connection url, including user and password
+# Can be obtained from `cf env grafana` after binding the app
+grafanaDatabaseUrl: "<db-url-with-user-pass>"
+
+# Password of the smtp server that you use for email notifications in grafana
+grafanaSmtpPassword: "<smtpPass>"

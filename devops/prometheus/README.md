@@ -15,7 +15,7 @@ $ yarn --version
 
 ## Configuration
 
-The following environment variables are recognized by the todo backend:
+The following environment variables are recognized by the prometheus server:
 
 | Variable     | Description | Required |
 |--------------|-------------|----------|
@@ -23,9 +23,17 @@ The following environment variables are recognized by the todo backend:
 
 ## Deploy to MindSphere
 
+Prometheus is deployed from its github sources. Since Prometheus is a Golang
+project and we require some custom configuration files to be uploaded when
+deploying to cloudfoundry, a script is provided that copies the relevant files
+into the checked out sources.
+
 1. Copy and adapt `conf/prometheus.yml.sample` to `conf/prometheus.yml`,
   specifically:
     - `targets` of `todo` job, point to the internal address of the todo app
+
+1. Follow the instructions on the [devopsadmin readme](../README.md) and copy
+  and adapt the cf vars file with the required configuration
 
 1. Download the prometheus source code. This will save the code to your
   `${GOPATH}` (typically `~/go` or `~/.go`)
@@ -34,32 +42,32 @@ The following environment variables are recognized by the todo backend:
     go get github.com/prometheus/prometheus/cmd/...
     ```
 
-1. Ensure you are in the right CloudFoundry space and push to MindSphere. The
-  command will also copy the required configuration files to the prometheus
-  source before push.
-
+1. Checkout the latest tested version (`v2.5.0` at the time of writing):
     ```sh
-    APP_NAME="prometheus" \
-    PROM_CONF_FILE="<path>" \
-    PROM_EXTERNAL_URL="<url>" \
-    ./deploy.sh
+    cd ${GOPATH}/src/github.com/prometheus/prometheus
+    git checkout v2.5.0
     ```
 
-  The param `PROM_CONFIG_FILE` points to your adapted configuration file.
+1. The manifest will bind itself to a LogMe (ELK) service to gather all logs,
+  make sure you have created it in advance:
 
-  The parameter `PROM_EXTERNAL_URL` is the address under which prometheus
-  should be reachable from the internet. If using the *devopsadmin* component
-  for this, it will be `<external-devopsadmin-url>/prometheus/`
+    ```sh
+    cf create-service logme logme-xs devopsadmin-logme
+    ```
 
-  The optional parameter `APP_NAME` is the name that will be used to push
-  the application.
+1. Ensure you are in the right CloudFoundry space and push to MindSphere. The
+  command will also copy the required configuration files to the prometheus
+  source before push:
 
-If you want to send all logs to LogMe (ELK), you can bind the app to the
-appropriate service name (see [main README.md](../../README.md)):
+    ```sh
+    CF_VARS_FILE="<path>" \
+    PROM_CONF_FILE="<path>" \
+    ./deploy_dev.sh
+    ```
 
-```sh
-cf bind-service prometheus todo-logme
-```
+  The param `CF_VARS_FILE` is your CloudFoundry adapted vars file.
+  
+  The param `PROM_CONF_FILE` points to your adapted configuration file.
 
 ## Local Build and Execution
 
