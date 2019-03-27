@@ -27,21 +27,33 @@ The following environment variables are recognized by the todo backend:
 
 ## CloudFoundry Deployment
 
+Grafana is deployed from its github sources. Since Grafana is a Golang
+project and we require some custom configuration files to be uploaded when
+deploying to cloudfoundry, a script is provided that copies the relevant files
+into the checked out sources.
+
 1. Copy and adapt the directory `sample-conf/`, specifically:
     - In `defaults.custom.ini`, set  `server.domain` and `smtp` configuration
     - In `datasources/prometheus.yaml`, set the appropriate url of prometheus
 
 1. Download the grafana source code. This will save the code to your
-  `${GOPATH}` (typically `~/go` or `~/.go`)
+  `${GOPATH}` (typically `~/go` or `~/.go`):
 
     ```sh
     go get github.com/grafana/grafana
     ```
 
+1. Checkout the latest tested version (`v5.3.4` at the time of writing):
+
+    ```sh
+    cd ${GOPATH}/src/github.com/grafana/grafana
+    git checkout v5.3.4
+    ```
+
 1. Build the grafana static web interface locally. This is required because we
   don't want to depend on two buildpacks (go & nodejs). Building the webpack
   locally before uploading to CloudFoundry allows us to keep the deployment
-  within a single buildpack. It is only required once.
+  within a single buildpack. It is only required once:
 
     ```sh
     yarn --cwd "$(go env GOPATH)/src/github.com/grafana/grafana"
@@ -54,40 +66,27 @@ The following environment variables are recognized by the todo backend:
     cf create-service postgresql94 postgresql-xs grafana-postgres
     ```
 
-1. Ensure you are in the right CloudFoundry space and deploy grafana. The
+1. The manifest will bind itself to a LogMe (ELK) service to gather all logs,
+  make sure you have created it in advance:
+
+    ```sh
+    cf create-service logme logme-xs devopsadmin-logme
+    ```
+
+1. Ensure you are in the right CloudFoundry space and deploy Grafana. The
   command will also copy the required configuration files to the local grafana
   source directory before push:
 
     ```sh
-    APP_NAME="grafana" \
-    DB_SVC_NAME="grafana-postgres" \
-    GF_CONF_DIR="./adapted-conf/" \
-    GF_DATABASE_URL="<db-connection-url>" \
-    GF_SMTP_PASSWORD="<password>" \
-    ./deploy.sh
+    CF_VARS_FILE="<path>" \
+    GF_CONF_DIR="<path>" \
+    ./deploy_dev.sh
     ```
+
+  The param `CF_VARS_FILE` is your CloudFoundry adapted vars file.
 
   The param `GF_CONFIG_DIR` points to your adapted configuration directory
   that will be uploaded
-
-  The param `GF_DATABASE_URL` is the full database connection url, including
-  user and password.
-
-  The param `GF_SMTP_PASSWORD` is the password of the smtp server that you use
-  for email notifications.
-
-  The optional parameter `APP_NAME` is the name that will be used to push the
-  application.
-
-  The optional parameter `DB_SVC_NAME` is the name of the db service to be
-  bound to.
-
-If you want to send all logs to LogMe (ELK), you can bind the app to the
-appropriate service name (see [main README.md](../../README.md)):
-
-```sh
-cf bind-service grafana todo-logme
-```
 
 ## Limitations: Alerting Notification Channels
 

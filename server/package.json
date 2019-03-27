@@ -1,7 +1,7 @@
 {
-  "name": "todo-backend",
-  "version": "0.2.0",
-  "description": "The backend of a simple todo app with a MongoDB backend",
+  "name": "todo",
+  "version": "0.5.0",
+  "description": "The backend of a simple todo app with a MongoDB data store",
   "repository": {
     "type": "git",
     "url": "https://gitlab.com/mindsphere/devops-demo.git"

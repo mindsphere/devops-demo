@@ -8,6 +8,11 @@
 /server/static/
 /test-reports/
 
+# MindSphere Operator zip
+/todo.zip
+/devops/build_zip/
+/devops/devopsadmin.zip
+
 # NPM and Yarn
 node_modules/
 npm-debug.log

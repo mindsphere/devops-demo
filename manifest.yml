@@ -1,0 +1,25 @@
+---
+# Adapt the following variables to your environment via `cf push --var`
+#
+# - mdspTenant
+# - mdspRegion
+#
+applications:
+  - name: todo
+    path: server/
+    buildpacks:
+      - nodejs_buildpack
+    services:
+      - todo-mongodb
+      - todo-logme
+    memory: 192M
+    disk_quota: 256M
+    random-route: true
+    stack: cflinuxfs3
+    instances: 1
+    health-check-type: http
+    health-check-http-endpoint: /health_check
+    env:
+      OPTIMIZE_MEMORY: true
+      MDSP_TENANT: ((mdspTenant))
+      MDSP_REGION: ((mdspRegion))

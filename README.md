@@ -1,6 +1,10 @@
 # MindSphere DevOps Demo
 
-![TODO app](./screenshot.png)
+![TODO app](./images/todo.png)
+
+![TODO OpenAPI 3 Navigator](./images/todo-api-docs.png)
+
+![DevOpsAdmin Grafana](./images/devopsadmin-grafana.png)
 
 Close interaction of development and operations is essential to accelerate
 delivery of applications. This is a demo across the whole DevOps cycle with
@@ -8,13 +12,15 @@ MindSphere, by using well known and widely used open source tools.
 
 High level architecture diagram (draw.io png with embedded xml):
 
-![High-level Architecture](./architecture.png)
+![High-level Architecture](./images/architecture.png)
 
 The demo consists of:
 
 - a simple todo app using the MEAN (MongoDB, Express.js, Angular, Node.js) stack
   - Angular App (root folder)
   - [Backend](server)
+    - the backend provides swagger-ui for navigating both the server apis and
+      the MindSphere APIs (under `/api-docs`)
   - local Angular dev server setup that proxies requests to MindSphere,
     allowing local development
 - a devops admin backend that provides access to prometheus and grafana
@@ -41,8 +47,8 @@ The following environment variables are recognized by the todo backend:
 
 | Variable     | Description | Required | Default |
 |--------------|-------------|----------|---------|
-| `JWKS_URI`   | JWKS endpoint, contains key used for validating auth tokens     | only on MindSphere deploy | *empty* |
-| `JWT_ISSUER` | Expected issuer of the token to be found in the JWT `iss` field | only on MindSphere deploy | *empty* |
+| `MDSP_TENANT` | MindSphere tenant identifier | only on MindSphere deploy | *empty* |
+| `MDSP_REGION` | MindSphere region identifier | only on MindSphere deploy | *empty* |
 
 ### Local Development
 
@@ -53,7 +59,7 @@ APIs you need to provide user credentials for your user.
 The local Angular development server is setup to use a local proxy based on
 WebPack that forwards api requests:
 
-- `/api/**` will be forwarded to `https://gateway.eu1.mindsphere.io`  
+- `/api/**` will be forwarded to `https://gateway.<MDSP_REGION>.mindsphere.io`  
   This applies to all [MindSphere API calls](https://developer.mindsphere.io/apis/index.html).
   You can check the [MindSphere service source](src/app/mindsphere.service.ts)
   for a sample.
@@ -70,11 +76,14 @@ todo API backend.
 1. As a first one-time step you need to register your application in the
     MindSphere Developer Cockpit by following the [official documentation](https://developer.mindsphere.io/howto/howto-cf-running-app.html#configure-the-application-via-the-developer-cockpit)
     - Create the application
-    - Register endpoints
+    - Register endpoints (a single `/**` is enough for this app)
     - **IMPORTANT** Configure the [application Roles & Scopes](https://developer.mindsphere.io/howto/howto-cf-running-app.html#configure-the-application-roles-scopes)
       Your application will only have access to the MindSphere APIs that are
-      configured in this step
+      configured in this step. Also assign the core role `mdsp:core:tm.tenantUser`
+      or the MindSphere OS Bar won't be able to show the tenant information
     - Register the application
+    - Assign the application scopes to the users that should have access (in the
+      tenant Settings app)
 1. Access your new application with a web browser and authenticate. On
     successful authentication the MindSphere gateway will setup some session
     cookies. Use the browser developer tools to copy the cookies `SESSION`
@@ -106,7 +115,22 @@ yarn
 yarn start
 ```
 
+Now load `http://localhost:4200`
+
+You can also reach the API navigator under `http://localhost:3000/api-docs`
+
 ### Deploy to MindSphere
+
+We provide a manifest file to be used for deployment to MindSphere:
+
+- The manifest uses `random-route: true`, this will create the application
+  with a random internal route to ensure no naming conflicts with other apps
+  in the same space (e.g. `todo-funny-chipmunk.apps.eu1.mindsphere`)
+- Please note that if you intend later to deploy devopsadmin, Grafana and
+  Prometheus, you'll need to set in their configuration the appropriate
+  internal random name assigned by the route directive
+- Take a look at the `.gitlab-ci.yml` file for an example of an actual
+  deployment performed by our CI pipeline
 
 Use `cf login` to connect via cli and make sure you can interact with the
 MindSphere CloudFoundry backend. Follow the
@@ -123,7 +147,8 @@ available:
     ```
 
 - Create the LogMe (ELK) service for log aggregation. This is
-  *not a requirement*, and the same service can be used to aggregate any
+  *not a requirement* and you could remove it from the manifest definition
+  The same service can be used to aggregate any
   number of app logs. The MindSphere platform will automatically gather
   the logs after binding:
 
@@ -135,32 +160,26 @@ Build & push the todo app, set authentication environment variables, and
 bind the services:
 
 ```sh
-# Build static angular app
+# Build static angular app into the server/ directory
 yarn
 yarn build:prod --no-progress
 
 # Push nodejs server
-cd server
-yarn
-cf push todo --no-start
-cf set-env todo JWKS_URI "${JWKS_URI}"
-cf set-env todo JWT_ISSUER "${JWT_ISSUER}"
-cf bind-service todo todo-mongodb
-cf bind-service todo todo-logme
-cf start todo
+yarn --cwd server
+cf push --var mdspTenant="${MDSP_TENANT}" --var mdspRegion="${MDSP_REGION}"
 ```
 
 (*Only once*) in the MindSphere Developer Cockpit, some CSP policy adaptations
-are needed:
+are needed on the `default-src` directive:
 
 - allow connections to the OpenAPI specs hosted on `developer.mindsphere.io`
 - allow connections to the piam endpoint of the gateway; this is required
   for login redirects when the user session token expires
 
-Example (substitute `<your-tenant>` by your tenant identifier):
+Example (substitute `<your-tenant>` and `<your-region>` accordingly):
 
 ```
-default-src 'self' <your-tenant>.piam.eu1.mindsphere.io developer.mindsphere.io static.eu1.mindsphere.io;
+default-src 'self' <your-tenant>.piam.<your-region>.mindsphere.io developer.mindsphere.io static.<your-region>.mindsphere.io;
 ```
 
 More information under: https://developer.mindsphere.io/concepts/concept-csp.html
