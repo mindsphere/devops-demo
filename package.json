@@ -1,6 +1,6 @@
 {
   "name": "todo-frontend",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "description": "The frontend of a simple todo app with a MongoDB backend",
   "repository": {
     "type": "git",
@@ -24,7 +24,8 @@
     "e2e": "ng e2e",
     "license": "license-checker --onlyAllow 'Apache-2.0; BSD; BSD-2-Clause; BSD-3-Clause; ISC; MIT; Unlicense; WTFPL; CC-BY-3.0; CC0-1.0' --production",
     "license:all": "yarn license && yarn --cwd server/ license && yarn --cwd devops/devopsadmin license",
-    "commitlint": "commitlint --from=master"
+    "commitlint": "commitlint --from=origin/master",
+    "mdsp:zip": "(which zip > /dev/null || { echo \"Please install the 'zip' command\"; exit 1; }) && { rm -f todo.zip; zip -r todo ./server -x 'server/node_modules/*'; }"
   },
   "private": true,
   "engines": {
@@ -53,8 +54,8 @@
     "@angular/cli": "~6.1.4",
     "@angular/compiler-cli": "^6.1.0",
     "@angular/language-service": "^6.1.0",
-    "@commitlint/cli": "^7.1.2",
-    "@commitlint/config-conventional": "^7.1.2",
+    "@commitlint/cli": "^7.5.0",
+    "@commitlint/config-conventional": "^7.5.0",
     "@types/jasmine": "~2.8.6",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
@@ -62,6 +63,7 @@
     "codelyzer": "^4.5.0",
     "eclint": "^2.8.0",
     "https-proxy-agent": "^2.2.1",
+    "husky": "^1.3.1",
     "jasmine-core": "~2.99.1",
     "jasmine-reporters": "^2.3.2",
     "jasmine-spec-reporter": "~4.2.1",
@@ -83,5 +85,10 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   }
 }

@@ -6,10 +6,11 @@ SPDX-License-Identifier: MIT
 const config = {
   mdsp: {
     appname: 'mdsp:core:im',
-    scope: 'userIamAdmin'
+    scope: 'userIamAdmin',
+    tenant: process.env.MDSP_TENANT,
+    region: process.env.MDSP_REGION
   },
   tech_user: {
-    oauth_endpoint: process.env.TECH_USER_OAUTH_ENDPOINT,
     client_id: process.env.TECH_USER_CLIENT_ID,
     client_secret: process.env.TECH_USER_CLIENT_SECRET
   }

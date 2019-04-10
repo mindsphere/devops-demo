@@ -53,11 +53,11 @@ const TodoServer = function() {
 
   const setupAuth = (app) => {
     if (process.env.VCAP_APPLICATION) {
-      if (!process.env.JWKS_URI) throw new Error('missing JWKS_URI configuration');
-      if (!process.env.JWT_ISSUER) throw new Error('missing JWT_ISSUER configuration');
+      if (!process.env.MDSP_TENANT) throw new Error('missing MDSP_TENANT configuration');
+      if (!process.env.MDSP_REGION) throw new Error('missing MDSP_REGION configuration');
 
-      console.log(`JWT jwksUri: ${process.env.JWKS_URI}`);
-      console.log(`JWT expected issuer: ${process.env.JWT_ISSUER}`);
+      console.log(`Configured MindSphere Tenant: ${process.env.MDSP_TENANT}`);
+      console.log(`Configured MindSphere Region: ${process.env.MDSP_REGION}`);
     }
 
     const NON_MDSP_USER = {
@@ -70,7 +70,7 @@ const TodoServer = function() {
       cache: true,
       rateLimit: true,
       jwksRequestsPerMinute: 5,
-      jwksUri: process.env.JWKS_URI
+      jwksUri: `https://${process.env.MDSP_TENANT}.piam.${process.env.MDSP_REGION}.mindsphere.io/token_keys`
     });
     const getKey = (header, callback) => {
       jwksClient.getSigningKey(header.kid, (err, key) => {
@@ -79,7 +79,7 @@ const TodoServer = function() {
       });
     };
     const options = {
-      issuer: process.env.JWT_ISSUER,
+      issuer: `https://${process.env.MDSP_TENANT}.piam.${process.env.MDSP_REGION}.mindsphere.io/oauth/token`,
       algorithms: ['RS256']
     };
 
@@ -131,7 +131,6 @@ const TodoServer = function() {
     // Prometheus metrics
     app.use(promBundle({includeMethod: true, includePath: true}));
 
-    const openApiSpecUrls = require('./openapi-spec-urls.js');
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(null, {
       explorer: true,
       swaggerOptions: {
