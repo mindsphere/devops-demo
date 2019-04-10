@@ -48,6 +48,7 @@ test:
     - yarn test --no-progress --code-coverage
     - yarn --cwd server
     - yarn --cwd devops/devopsadmin
+    - yarn --cwd agent
     - yarn license:all
     - export BASE_URL=http://$(hostname -i):3000
     - yarn e2e

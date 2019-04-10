@@ -1,0 +1,12 @@
+{
+  "content": {
+    "baseUrl": "https://southgate.eu1.mindsphere.io",
+    "iat": "<yourtoken>",
+    "clientCredentialProfile": [
+      "SHARED_SECRET"
+    ],
+    "clientId": "<youragentid>",
+    "tenant": "<yourtenant>"
+  },
+  "expiration": "<yourexpiration>"
+}
