@@ -3,18 +3,20 @@
 GOPATH=$(go env GOPATH)
 PROM_SRC_PATH="${GOPATH}/src/github.com/prometheus/prometheus"
 GF_SRC_PATH="${GOPATH}/src/github.com/grafana/grafana"
+BUILDDIR="build_zip"
 
 which zip > /dev/null || { echo \"Please install the 'zip' command\"; exit 1; }
 
 rm -f devopsadmin.zip
-rm -rf build_zip
+rm -rf ${BUILDDIR}
 
-mkdir build_zip
-cp -r devopsadmin build_zip
-cp -r ${PROM_SRC_PATH} build_zip
-cp -r ${GF_SRC_PATH} build_zip
+mkdir ${BUILDDIR}
+cp README.md vars-file.yml.sample ${BUILDDIR}
+cp -r devopsadmin ${BUILDDIR}
+cp -r ${PROM_SRC_PATH} ${BUILDDIR}
+cp -r ${GF_SRC_PATH} ${BUILDDIR}
 
-pushd build_zip
+pushd ${BUILDDIR}
 zip -r devopsadmin . \
     -x 'devopsadmin/node_modules/*' \
     -x 'prometheus/.git/*' \
@@ -26,4 +28,4 @@ zip -r devopsadmin . \
     -x 'grafana/bin/*' \
     -x 'grafana/node_modules/*'
 popd
-mv build_zip/devopsadmin.zip .
+mv ${BUILDDIR}/devopsadmin.zip .
