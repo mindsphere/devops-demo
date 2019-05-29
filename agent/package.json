@@ -13,8 +13,7 @@
   "license": "MIT",
   "private": true,
   "engines": {
-    "node": "^8.11.1",
-    "npm": "^5.6.0"
+    "node": ">=8"
   },
   "dependencies": {
     "@mindconnect/mindconnect-nodejs": "^3.3.0"
